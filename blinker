@@ -1,0 +1,148 @@
+const int interruptPin = 2;
+static unsigned long last_interrupt_time = 0 ;
+static int ledCount = 0;
+int currentDiode = 0;
+unsigned long TimerStart = 0;
+
+
+int const SwitchLedCntPin = 6;
+int const LED1 = (1<<1);
+int const LED2 = (1<<1) | (1<<2);
+int const LED3 = (1<<1) | (1<<2) | (1<<3);
+int const LED4 = (1<<1) | (1<<2) | (1<<3) | (1<<4);
+
+void SerialInit();
+void SetGPIO();
+void TurnLedOn(int LedNumber);
+bool CheckAvailablekLedNumber(int CurrentLedCnt);
+void TurnOffLeds();
+
+
+
+void SetGPIO(){
+//  int ledCount
+  int SwitchLedCntState = 0;
+  Serial.println("SetGPIO - started");
+  pinMode(SwitchLedCntPin,INPUT);
+  Serial.println(String("SetGPIO - Set pin:") + String(SwitchLedCntPin) + String(" as input"));
+  SwitchLedCntState = digitalRead(SwitchLedCntPin);
+  Serial.println(String("SetGPIO - SwitchLedCntPin state:") + String(SwitchLedCntState));
+ 
+  if (SwitchLedCntState)
+  {
+    ledCount = 4;
+  }
+  else
+  {
+    Serial.println("fsdfs");
+    ledCount = 3;
+  }
+  Serial.println(String("Count of LED: ") + String(ledCount));
+  switch (ledCount) {
+    case 0:    
+      Serial.println("No LED");
+      break;
+    case 1:    
+      DDRB |= LED1;
+      break;
+    case 2:   
+      DDRB |= LED2;
+      break;
+    case 3:  
+      DDRB |= LED3;
+      break;
+    case 4: 
+      DDRB |= LED4;
+      break;
+  }  
+}
+
+void setup() {
+  SerialInit();
+  SetGPIO();
+  attachInterrupt(digitalPinToInterrupt(interruptPin), Blinker, LOW);
+}
+
+void loop() {
+  unsigned long CurrentTimerValue = millis();
+  Serial.println(String("Start timer value: " ) + String(TimerStart));
+  Serial.println(String("Current timer value: " ) + String(CurrentTimerValue));
+  Serial.println(String("roznicae: " ) + String(CurrentTimerValue - TimerStart));
+  delay(1000);
+}
+
+
+
+void SerialInit() {
+Serial.begin(115200);
+Serial.println("Serial - started");
+}
+
+void TurnOffLeds(){
+  Serial.println("TurnOffLeds - started");
+  PORTB &= ~(LED4);  
+  currentDiode = 0;
+  TimerStart = 0;
+}
+
+bool CheckAvailablekLedNumber(int CurrentLedCnt){
+  Serial.println("CheckAvailablekLedNumber - started");
+  Serial.println(String("Current led number ") + String(CurrentLedCnt));
+  if ( CurrentLedCnt <= ledCount )
+  {
+     return true;
+  }
+  else
+  {
+     return false;
+  }
+}
+void TurnLedOn(int LedNumber)
+{
+  Serial.println("Wlaczam diode");
+  Serial.println(String(LedNumber));
+  switch (LedNumber) {
+    case 0:    
+      Serial.println("No LED");
+      break;
+    case 1:    
+      PORTB |= LED1;
+      break;
+    case 2:   
+      PORTB |= LED2;
+      break;
+    case 3:  
+      PORTB |= LED3;
+      break;
+    case 4: 
+      PORTB |= LED4;
+      break;
+  }   
+}
+
+
+void Blinker()
+{
+  
+  unsigned long interrupt_time = millis();
+//  Serial.println("Interupt");
+  if (interrupt_time - last_interrupt_time > 200)
+  {
+    Serial.println("Interrupt get millis value");
+    TimerStart = millis();
+    currentDiode++;
+    bool result = CheckAvailablekLedNumber(currentDiode);
+    if (result) 
+    {
+      TurnLedOn(currentDiode);
+    }
+    else {
+     Serial.println("Wylaczamy diody");
+     TurnOffLeds();     
+    }
+  } 
+  else {
+    delay(50);    
+  }
+  last_interrupt_time = interrupt_time;
+}
