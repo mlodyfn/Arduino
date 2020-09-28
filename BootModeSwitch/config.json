@@ -1,0 +1,6 @@
+{
+"PDU": "10.45.181.181",
+"BANK": "b4",
+"SerialDevice" : "/dev/ttyUSB0",
+"Baudrate" : 115200
+}
