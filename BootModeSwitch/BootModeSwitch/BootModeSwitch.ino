@@ -6,7 +6,7 @@ bool stringCompleted = false;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("Board started");
+  //Serial.println("Board started");
   inputString.reserve(200);
   pinMode(PIN0,OUTPUT);
   digitalWrite(PIN0,HIGH);
@@ -22,12 +22,12 @@ void loop() {
     {
 
       digitalWrite(PIN0,LOW);
-      Serial.println("pin0 1");
+      Serial.println("OK");
     }
     else if(inputString =="pin0 0\n")
     {
       digitalWrite(PIN0,HIGH);
-      Serial.println("Pin0 0");
+      Serial.println("OK");
     }
     inputString = "";
     stringCompleted = false;
@@ -43,7 +43,7 @@ void serialEvent()
   {
     char inChar = (char) Serial.read();
     inputString += inChar;
-    Serial.println(inputString);
+//    Serial.println(inputString);
     if (inChar == '\n')
     {
       stringCompleted = true;
